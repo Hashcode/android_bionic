@@ -2,15 +2,15 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(gettid)
-    movl    $__NR_gettid, %eax
+ENTRY(__getdents64)
+    movl    $__NR_getdents64, %eax
     syscall
     cmpq    $-MAX_ERRNO, %rax
     jb      1f
     negl    %eax
     movl    %eax, %edi
     call    __set_errno
-    orq     $-1, %rax
 1:
     ret
-END(gettid)
+END(__getdents64)
+.hidden __getdents64

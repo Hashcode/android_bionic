@@ -2,7 +2,7 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(getdents)
+ENTRY(__getdents64)
     pushl   %ebx
     .cfi_def_cfa_offset 8
     .cfi_rel_offset ebx, 0
@@ -23,10 +23,9 @@ ENTRY(getdents)
     pushl   %eax
     call    __set_errno
     addl    $4, %esp
-    orl     $-1, %eax
 1:
     popl    %edx
     popl    %ecx
     popl    %ebx
     ret
-END(getdents)
+END(__getdents64)

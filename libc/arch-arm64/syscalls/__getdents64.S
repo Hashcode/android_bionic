@@ -2,14 +2,14 @@
 
 #include <private/bionic_asm.h>
 
-ENTRY(gettid)
+ENTRY(__getdents64)
     stp     x29, x30, [sp, #-16]!
     .cfi_def_cfa_offset 16
     .cfi_rel_offset x29, 0
     .cfi_rel_offset x30, 8
     mov     x29,  sp
 
-    mov     x8, __NR_gettid
+    mov     x8, __NR_getdents64
     svc     #0
 
     ldp     x29, x30, [sp], #16
@@ -22,4 +22,5 @@ ENTRY(gettid)
     b.hi    __set_errno
 
     ret
-END(gettid)
+END(__getdents64)
+.hidden __getdents64

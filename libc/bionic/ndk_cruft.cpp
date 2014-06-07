@@ -30,8 +30,10 @@
 #if !defined(__LP64__)
 
 #include <ctype.h>
+#include <dirent.h>
 #include <inttypes.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/resource.h>
@@ -40,6 +42,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <wchar.h>
 
 // These were accidentally declared in <unistd.h> because we stupidly used to inline
 // getpagesize() and __getpageshift(). Needed for backwards compatibility with old NDK apps.
@@ -219,6 +222,27 @@ extern "C" int __futex_wait(volatile void* ftx, int value, const struct timespec
 // Unity's libmono uses this.
 extern "C" int tkill(pid_t tid, int sig) {
   return syscall(__NR_tkill, tid, sig);
+}
+
+extern "C" wchar_t* wcswcs(wchar_t* haystack, wchar_t* needle) {
+  return wcsstr(haystack, needle);
+}
+
+// This was removed from POSIX 2008.
+extern "C" sighandler_t bsd_signal(int signum, sighandler_t handler) {
+  return signal(signum, handler);
+}
+
+// sysv_signal() was never in POSIX.
+extern sighandler_t _signal(int signum, sighandler_t handler, int flags);
+extern "C" sighandler_t sysv_signal(int signum, sighandler_t handler) {
+  return _signal(signum, handler, SA_RESETHAND);
+}
+
+// This is a system call that was never in POSIX. Use readdir(3) instead.
+extern "C" int __getdents64(unsigned int, dirent*, unsigned int);
+extern "C" int getdents(unsigned int fd, dirent* dirp, unsigned int count) {
+  return __getdents64(fd, dirp, count);
 }
 
 #endif
